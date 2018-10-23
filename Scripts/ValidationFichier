@@ -4,13 +4,46 @@
 directory=../Àtraiter
 fichiers=$(ls $directory)
 
+regexNomCourriel="\"(\w|\s)*\"\s<\w*@\w*\.com>"
+regexDate="(Mon|Tue|Wed|Thu|Fri|Sat|Sun),\s([0-9]\s|1[0-9]\s|2[0-9]\s|3[0-1]\s)(Jul|Aug|Sep|Oct|Nov|Dec|Jan|Feb|Mar|Apr|May|Jun)\s(201[89])\s(([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9])"
+regexSujet="(\w|\s){3,20}"
+regexMessage=".*\S.*"
+
 for fichier in $fichiers
 do
-	echo "$fichier"
-	auteur=$(grep -E "^\".{5,}\S.*\"\s<.*@.*\S.*\.(com|ca|org|us)>$" $directory/$fichier)
-	echo "$auteur"
-	date=$(grep -E "^(Mon|Tue|Wed|Thu|Fri|Sat|Sun),\s([0-9]\s|1[0-9]\s|2[0-9]\s|3[0-1]\s)(Jul|Aug|Sep|Oct|Nov|Dec|Jan|Feb|Mar|Apr|May|Jun)\s(201[89])\s([0-2][0-9]:[0-5][0-9]:[0-5][0-9])$" $directory/$fichier)
-	echo "$date"
-done 
-
-
+	auteur=$(cut -f1 -d ';' $directory/$fichier)
+	if [[ $auteur =~ $regexNomCourriel ]]
+		then
+		echo "$auteur"
+		else
+		echo -e "\e[31mSyntaxe inccorecte pour lauteur"
+	fi		
+	date=$(cut -f2 -d ';' $directory/$fichier)
+	if [[ $date =~ $regexDate ]]
+		then
+		echo "$date"
+		else
+		echo "!!Syntaxe incorrecte pour la date"
+	fi
+	sujet=$(cut -f3 -d ';' $directory/$fichier)
+	if [[ $sujet =~ $regexSujet ]]
+		then
+		echo "$sujet"
+		else
+		echo "Syntaxe incorrecte pour le sujet"
+	fi
+	destinataire=$(cut -f4 -d ';' $directory/$fichier)
+	if [[ $destinataire =~ $regexNomCourriel  ]]
+		then
+		echo "$destinataire"
+		else
+		echo "Syntaxe incorrecte pour le destinataire"
+	fi
+	message=$(cut -f5 -d ';' $directory/$fichier)
+	if [[ $message =~ $regexMessage  ]]
+		then
+		echo "$message"
+		else
+		echo "Syntaxe incorrecte pour le message"
+	fi 
+done
