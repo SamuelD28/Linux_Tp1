@@ -15,75 +15,107 @@ regexMessage=".*\S.*"
 formatValid="\e[92m%-22s%s\e[39m\n"
 formatInvalid="\e[31m%-22s%s\e[39m\n"
 
-line='----------------------------------------'
+
+
+function EffectuerVerification
+{
+	if [[ $1 =~ $2 ]]
+		then
+			printf "$formatValid" $3 "Valide"
+			return 1
+		else
+			printf "$formatInvalid" $3  "Invalide"
+			return 0
+	fi
+}
+
+function VerifierValeurRetour
+{
+	if [ $1 -eq 0 ]
+		then
+		isValid=$?
+	fi
+}
+
+function GenererNomFichier
+{
+	compteur=1
+	fileName=$(date '+%Y%m%d%H%M')
+	fileExtension="_${compteur}.eml"
+	
+	while [ -e $1/$fileName$fileExtension ]
+	do 
+		compteur=$((compteur+1))
+		fileExtension="_${compteur}.eml"
+	done
+	
+	nomFichier="${fileName}${fileExtension}"
+}
+
+function VerifierFichierExiste
+{
+	if [ ! -d $1 ]
+		then
+		$(mkdir $1)
+	fi
+}
+
+function GenererNomPourDossier
+{
+	nom=$(echo "$auteur" | egrep -o "^\"(\w|\s)*\"")
+	nom=${nom//' '/_}
+	nomLenght=$(( ${#nom} - 2 ))
+	nom=${nom:1:nomLenght}
+}
+
+function GenererCompaniePourDossier
+{
+	company=$(echo "$auteur" | egrep -o "<\w*@\w*\.com>")
+	companyLenght=$(( ${#company} - 2 ))
+	company=${company:1:companyLenght}
+}
 
 for fichier in $fichiers
 do
-	isValid=1
-	erreurMessage=
 	echo -e "\e[96m\n~~~~~~~~$fichier~~~~~~~~\e[39m";
 	
+	isValid=1
 	auteur=$(cut -f1 -d ';' $directoryATraiter/$fichier)
-	if [[ $auteur =~ $regexNomCourriel ]]
-		then
-			printf "$formatValid" "Auteur" "Valide"
-		else
-			printf "$formatInvalid" "Auteur" "Invalide"
-			isValid=0
-	fi		
+	EffectuerVerification "$auteur" "$regexNomCourriel" "Auteur"
+	VerifierValeurRetour $?
 	
 	date=$(cut -f2 -d ';' $directoryATraiter/$fichier)
-	if [[ $date =~ $regexDate ]]
-		then
-			printf "$formatValid" "Date" "Valide"
-		else
-			printf "$formatInvalid" "Date" "Invalide"
-			isValid=0
-	fi
+	EffectuerVerification "$date" "$regexDate" "Date"
+	VerifierValeurRetour $?
 	
 	sujet=$(cut -f3 -d ';' $directoryATraiter/$fichier)
-	if [[ $sujet =~ $regexSujet ]]
-		then
-			printf "$formatValid" "Sujet" "Valide"
-		else
-			printf "$formatInvalid" "Sujet" "Invalide"
-			isValid=0
-	fi
+	EffectuerVerification "$sujet" "$regexSujet" "Sujet"
+	VerifierValeurRetour $?
 	
 	destinataire=$(cut -f4 -d ';' $directoryATraiter/$fichier)
-	if [[ $destinataire =~ $regexNomCourriel  ]]
-		then
-			printf "$formatValid" "Destinataire" "Valide"
-		else
-			printf "$formatInvalid" "Destinataire" "Invalide"
-			isValid=0
-	fi
+	EffectuerVerification "$destinataire" "$regexNomCourriel" "Destinataire"
+	VerifierValeurRetour $?
 	
 	message=$(cut -f5 -d ';' $directoryATraiter/$fichier)
-	if [[ $message =~ $regexMessage  ]]
-		then
-			printf "$formatValid" "Message" "Valide"
-		else
-			printf "$formatInvalid" "Message" "Invalide"
-			isValid=0
-	fi 
+	EffectuerVerification "$message" "$regexMessage" "Message"
+	VerifierValeurRetour $?
 	
 	if [ $isValid -eq 0 ]
 		then
-			$(mv $directoryATraiter/$fichier $directoryInvalides)
+			nomFichier=
+			GenererNomFichier $directoryInvalides	
+			$(mv $directoryATraiter/$fichier $directoryInvalides/$nomFichier)
 		else
-			company=$(echo "$auteur" | egrep -o "<\w*@\w*\.com>")
-			companyLenght=$(( ${#company} - 2 ))
-			company=${company:1:companyLenght}
-			$(mkdir $directoryTraites/$company)
+			company=
+			VerifierFichierExiste $directoryTraites/$company
 			
-			nom=$(echo "$auteur" | egrep -o "^\"(\w|\s)*\"")
-			nom=${nom//' '/_}
-			nomLenght=$(( ${#nom} - 2 ))
-			nom=${nom:1:nomLenght}
-			$(mkdir $directoryTraites/$company/$nom)
+			nom=
+			GenererNomPourDossier
+			VerifierFichierExiste $directoryTraites/$company/$nom
 			
-			$(mv $directoryATraiter/$fichier $directoryTraites/$company/$nom)
+			nomFichier=
+			GenererNomFichier  $directoryTraites/$company/$nom 
+			$(mv $directoryATraiter/$fichier $directoryTraites/$company/$nom/$nomFichier)
 	fi
 	
 	echo -e "\e[96m////////////////////////////\e[39m";
