@@ -72,13 +72,18 @@ do
 		then
 			$(mv $directoryATraiter/$fichier $directoryInvalides)
 		else
-			echo "$auteur"
+			company=$(echo "$auteur" | egrep -o "<\w*@\w*\.com>")
+			companyLenght=$(( ${#company} - 2 ))
+			company=${company:1:companyLenght}
+			$(mkdir $directoryTraites/$company)
+			
 			nom=$(echo "$auteur" | egrep -o "^\"(\w|\s)*\"")
 			nom=${nom//' '/_}
-			lenght=$(( ${#nom} - 2 ))
-			nom=${nom:1:lenght}
-			echo "$nom"
-			$(mkdir $directoryTraites/$nom)
+			nomLenght=$(( ${#nom} - 2 ))
+			nom=${nom:1:nomLenght}
+			$(mkdir $directoryTraites/$company/$nom)
+			
+			$(mv $directoryATraiter/$fichier $directoryTraites/$company/$nom)
 	fi
 	
 	echo -e "\e[96m////////////////////////////\e[39m";

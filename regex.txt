@@ -2,3 +2,15 @@ validation auteur & destinataire: \"(\w|\s)*\"\s<\w*@\w*\.com>
 validation date : (Mon|Tue|Wed|Thu|Fri|Sat|Sun),\s([0-9]\s|1[0-9]\s|2[0-9]\s|3[0-1]\s)(Jul|Aug|Sep|Oct|Nov|Dec|Jan|Feb|Mar|Apr|May|Jun)\s(201[89])\s(([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9])
 validation sujet : (\w|\s){3,20}
 validation message : .*\S.*
+
+
+/201811040912_1.eml 
+
+aaaammjjHHMM_X.eml  
+
+aaaa = année courante 
+mm = mois courant  
+jj = jour courant  
+HH = heure courante  
+MM = minute courante  
+X = Incrémentation dans le cas où un fichier de la même date/heure existe. 
