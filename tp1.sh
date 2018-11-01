@@ -2,28 +2,27 @@
 #Script pur la validation des fichiers
 
 directoryATraiter=$HOME/workspace/Tp1/Àtraiter
-directoryTraites=$HOME/workspace/Tp1/Traités
-directoryInvalides=$HOME/workspace/Tp1/Invalides
 
-fichiers=$(ls $directoryATraiter)
+# Date plus le format approprié. Utilisé à travers plusieurs scripts
+dt=$(date '+%Y-%m-%d %H:%M')
 
+# Tout les regex utlisés pour le traitement sont utilisés ici
 regexNomCourriel="\"(\w|\s)*\"\s<\w*@\w*\.com>"
 regexDate="(Mon|Tue|Wed|Thu|Fri|Sat|Sun),\s([0-9]\s|1[0-9]\s|2[0-9]\s|3[0-1]\s)(Jul|Aug|Sep|Oct|Nov|Dec|Jan|Feb|Mar|Apr|May|Jun)\s(201[89])\s(([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9])"
 regexSujet="(\w|\s){3,20}"
 regexMessage=".*\S.*"
 
-#a extraire
-formatValid="\e[92m%-22s%s\e[39m\n"
-formatInvalid="\e[31m%-22s%s\e[39m\n"
-
-dt=$(date '+%Y-%m-%d %H:%M')
-
+# Importations de toutes les méthodes servant au traitement des fichier mail
+source ./scripts/afficherVerificationChamps.sh
 source ./scripts/extraireChampMail.sh
+source ./scripts/extraireNomChamp.sh
+source ./scripts/extraireChampsMail.sh
 source ./scripts/verificationRegexChamp.sh
 source ./scripts/verificationFichierExiste.sh
 source ./scripts/genererNomFichier.sh
 source ./scripts/genererNomDossier.sh
-source ./scripts/genererNomCompany.sh
+source ./scripts/genererNomCompanie.sh
+source ./scripts/transfererMail.sh
 
 function AjouterLogValide
 {
@@ -37,48 +36,30 @@ function AjouterLogInvalide
 	echo "$logInvalide"  > ./courriels.log
 }
 
-champs=()
-
-
-# function ExtraireToutLesChamps
-# {
-	for fichier in $fichiers
+# Fonction Principal s'occupant de gerer le traitement des fichiers.
+function Main
+{
+	for fichier in $(ls $directoryATraiter)
 	do
-		echo -e "\e[96m\n~~~~~~~~$fichier~~~~~~~~\e[39m";
+		# Le Array champs contient les champs dans l'ordre suivant
+		# [0] auteur
+		# [1] date
+		# [2] sujet
+		# [3] destinataire
+		# [4] message
 		
-		auteur=$(ExtraireChampMail "auteur" $regexNomCourriel)
-		date=$(ExtraireChampMail "date" $regexDate)
-		sujet=$(ExtraireChampMail "sujet" $regexSujet)
-		destinataire=$(ExtraireChampMail "destinataire" $regexNomCourriel)
-		message=$(ExtraireChampMail "message" $regexMessage)
+		# On Extrait tous les champs contenu dans le fichier. champs est d'ordre global ici
+		champs=()
+		ExtraireChampsMail $directoryATraiter/$fichier
 		
-		champs[0]=$auteur; 
-		champs[1]=$date;
-		champs[2]=$sujet;
-		champs[3]=$destinataire;
-		champs[4]=$message;
+		# On affiche les résultats de la validation pour chaque champ dans la console. On change Valid a 0 si une validation a échoué
+		isValid=1
+		AfficherVerificationChamps 
 		
-		echo ${champs[*]}
-		
-		# if [ $isValid -eq 0 ]
-		# 	then
-		# 		nomFichier=$(GenererNomFichier $directoryInvalides)
-		# 		$(mv $directoryATraiter/$fichier $directoryInvalides/$nomFichier)
-	
-		# 		AjouterLogInvalide $nomFichier
-		# 	else 
-		# 		company=$(GenererNomCompany "$auteur")
-		# 		VerifierDossierExiste $directoryTraites/$company
-				
-		# 		nomDossier=$(GenererNomDossier "$auteur")
-		# 		VerifierDossierExiste $directoryTraites/$company/$nomDossier
-				
-		# 		nomFichier=$(GenererNomFichier  $directoryTraites/$company/$nomDossier)
-		# 		$(mv $directoryATraiter/$fichier $directoryTraites/$company/$nomDossier/$nomFichier)
-	
-		# 		AjouterLogValide $nomDossier $nomFichier $auteur $destinataire
-		# fi
-		
-		echo -e "\e[96m////////////////////////////\e[39m";
+		# On transfère le mail dans le dossier approprié à la fin du traitement
+		TransfererMail
 	done
-# }
+}
+
+# Appel à la fonction principal Main. Un peu inutilie mais j'aime une structure propre
+Main
