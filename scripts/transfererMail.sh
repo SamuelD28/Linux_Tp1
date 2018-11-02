@@ -1,6 +1,13 @@
 #Fonction s'occupant de transferer tout le mail dans les
 # dossiers appropriés.
 
+source $HOME/workspace/Tp1/scripts/utilitaire/verificationFichierExiste.sh
+source $HOME/workspace/Tp1/scripts/generer/genererNomCompanie.sh
+source $HOME/workspace/Tp1/scripts/generer/genererNomDossier.sh
+source $HOME/workspace/Tp1/scripts/generer/genererNomFichier.sh
+source $HOME/workspace/Tp1/scripts/log/ajouterLogValide.sh
+source $HOME/workspace/Tp1/scripts/log/ajouterLogInvalide.sh
+
 directoryTraites=$HOME/workspace/Tp1/Traités
 directoryInvalides=$HOME/workspace/Tp1/Invalides
 

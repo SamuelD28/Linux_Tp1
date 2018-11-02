@@ -1,6 +1,9 @@
 # Fonction s'occupant de créer un array avec touts les champs nécéssaires
 # pour le traitement des données
 # $1 chemin vers le fichier
+
+source $HOME/workspace/Tp1/scripts/extraire/extraireChampMail.sh
+
 function ExtraireChampsMail
 {
 	p_champs=()

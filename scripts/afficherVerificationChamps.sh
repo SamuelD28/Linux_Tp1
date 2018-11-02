@@ -1,4 +1,7 @@
 # Fonction s'occupant de d'afficher la validation dans la console
+
+source $HOME/workspace/Tp1/scripts/extraire/extraireNomChamp.sh
+
 function AfficherVerificationChamps
 {
 	# Format utilisés pour un message valide ou invalide

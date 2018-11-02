@@ -2,6 +2,9 @@
 # $1 colone à extraire
 # $2 regex pour verification
 # $3 chemin vers le fichier
+
+source $HOME/workspace/Tp1/scripts/utilitaire/verificationRegexChamp.sh
+
 function ExtraireChampMail
 {
 	# Switch pour determiner la colone à aller chercher

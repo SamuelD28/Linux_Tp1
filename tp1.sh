@@ -13,28 +13,9 @@ regexSujet="(\w|\s){3,20}"
 regexMessage=".*\S.*"
 
 # Importations de toutes les méthodes servant au traitement des fichier mail
-source ./scripts/afficherVerificationChamps.sh
-source ./scripts/extraireChampMail.sh
-source ./scripts/extraireNomChamp.sh
-source ./scripts/extraireChampsMail.sh
-source ./scripts/verificationRegexChamp.sh
-source ./scripts/verificationFichierExiste.sh
-source ./scripts/genererNomFichier.sh
-source ./scripts/genererNomDossier.sh
-source ./scripts/genererNomCompanie.sh
-source ./scripts/transfererMail.sh
-
-function AjouterLogValide
-{
-	logValide="[$dt] $1/$2/$3 : $1 -> $4 OK" 
-	echo "$logValide" > ./courriels.log
-}
-
-function AjouterLogInvalide
-{
-	logInvalide="[$dt] invalide/$1 : INVALIDE"
-	echo "$logInvalide"  > ./courriels.log
-}
+source $HOME/workspace/Tp1/scripts/afficherVerificationChamps.sh
+source $HOME/workspace/Tp1/scripts/transfererMail.sh
+source $HOME/workspace/Tp1/scripts/extraire/extraireChampsMail.sh
 
 # Fonction Principal s'occupant de gerer le traitement des fichiers.
 function Main
