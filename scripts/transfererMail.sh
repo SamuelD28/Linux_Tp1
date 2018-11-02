@@ -5,6 +5,7 @@ source $HOME/workspace/Tp1/scripts/utilitaire/verificationFichierExiste.sh
 source $HOME/workspace/Tp1/scripts/generer/genererNomCompanie.sh
 source $HOME/workspace/Tp1/scripts/generer/genererNomDossier.sh
 source $HOME/workspace/Tp1/scripts/generer/genererNomFichier.sh
+source $HOME/workspace/Tp1/scripts/generer/genererEmailCompagnie.sh
 source $HOME/workspace/Tp1/scripts/log/ajouterLogValide.sh
 source $HOME/workspace/Tp1/scripts/log/ajouterLogInvalide.sh
 
@@ -20,6 +21,8 @@ function TransfererMail
 
 			AjouterLogInvalide $p_nomFichier
 		else 
+			p_emailDestinataire=$(GenererEmailComapgnie "${champs[3]}")
+			p_emailCompagnie=$(GenererEmailComapgnie "${champs[0]}")
 			p_nomCompanie=$(GenererNomCompanie "${champs[0]}")
 			VerifierDossierExiste $directoryTraites/$p_nomCompanie
 			
@@ -29,6 +32,6 @@ function TransfererMail
 			p_nomFichier=$(GenererNomFichier  $directoryTraites/$p_nomCompanie/$p_nomDossier)
 			$(mv $directoryATraiter/$fichier $directoryTraites/$p_nomCompanie/$p_nomDossier/$p_nomFichier)
 
-			AjouterLogValide $p_nomDossier $p_nomFichier ${champs[0]} ${champs[3]}
+			AjouterLogValide "$p_nomCompanie" "$p_nomDossier" "$p_nomFichier" "$p_emailCompagnie" "$p_emailDestinataire"
 	fi
 }
